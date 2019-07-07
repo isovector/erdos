@@ -62,6 +62,7 @@
   }
 
   function callback(data) {
+    console.log("hello" ++ data);
     for (var i=1;i<data.length;i++) {
 
       address=data[i][2];
@@ -81,6 +82,8 @@
 
           var marker = new google.maps.Marker({
             position:results[0].geometry.location,
+            draggable:true,
+            animation: google.maps.Animation.DROP,
             map:map
           });
         }else{
