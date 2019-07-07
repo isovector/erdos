@@ -39,19 +39,56 @@
     //Create a geocoder
     geocoder = new google.maps.Geocoder();
 
+    var pos = new google.maps.LatLng(42.456187,-71.0653);
     map=new google.maps.Map(document.getElementById('map_canvas'),{
-      center:new google.maps.LatLng(42.456187,-71.0653),
+      center: pos,
       zoom:10,
       maxZoom:20,
       mapTypeId:google.maps.MapTypeId.ROADMAP
     });
 
     navigator.geolocation.getCurrentPosition(function(position) {
-      var pos = new google.maps.LatLng(position.coords.latitude,
-                                       position.coords.longitude);
+      pos = new google.maps.LatLng(position.coords.latitude,
+                                   position.coords.longitude);
 
       map.setCenter(pos);
+      marker.setPosition(pos);
     });
+
+    var marker = new google.maps.Marker({
+      position: pos,
+      draggable: true,
+      animation: google.maps.Animation.DROP,
+      map: map
+    });
+    marker.setMap(map);
+
+    google.maps.event.addListener(marker, 'dragend', function()
+     {
+       geocodePosition(marker.getPosition());
+     });
+
+     function geocodePosition(pos)
+     {
+      geocoder = new google.maps.Geocoder();
+      geocoder.geocode
+       ({
+         latLng: pos
+       },
+         function(results, status)
+         {
+           if (status == google.maps.GeocoderStatus.OK)
+           {
+             console.log(results);
+             document.getElementById("frame").contentWindow.getElementsByName("entry.47926294")[0].dataInitialValue = results[0].formatted_address;
+           }
+           else
+           {
+             console.log(status);
+           }
+         }
+       );
+     }
 
     //Inject JavaScript (returned JSON) into the head of the page.
     var scriptElement=document.createElement('script');
@@ -102,7 +139,7 @@
       <input type="button" value="Update Map" onclick="document.location.reload(true)">
     </div>
     <div id="gform">
-      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfuHXWaEbH_uLnYXjkgH19BwfBG5jfjtE6p1oJt85skEd8CIw/viewform?embedded=true" width="640" height="1384" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
+      <iframe id="frame" src="https://docs.google.com/forms/d/e/1FAIpQLSfuHXWaEbH_uLnYXjkgH19BwfBG5jfjtE6p1oJt85skEd8CIw/viewform?embedded=true" width="640" height="1384" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
     </div>
   </div>
 </body>
