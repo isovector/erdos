@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Googlemaps + Google Sheets + Google Forms</title>
+  <style>
+    html,body{
+      margin:0;
+      padding:0;
+      width:100%;
+      height:100%;
+    }
+
+    #map_canvas{
+      float:left;
+      width:50%;
+      height:100%;
+    }
+    #panel{
+      float:right;
+      width:50%;
+      height:100%;
+      background-color:#000;
+    }
+    #gform{
+      height: calc(100% - 22px);
+    }
+  </style>
+</head>
+
+<script src="https://maps.google.com/maps/api/js?key=AIzaSyCT8N_do4oHUyQgKCDbHug9LmHwBH8RJgA&sensor=false"></script>
+<script>
+  var DATA_SERVICE_URL="https://script.google.com/macros/s/AKfycbxlrne30-sOf-cHAmGj7s6qpzJKQ9Y591gMzYK0ZKNSwBRQNuOK/exec?jsonp=callback";
+
+  var geocoder;
+  var map;
+
+  function initialize() {
+    //Create a geocoder
+    geocoder = new google.maps.Geocoder();
+
+    map=new google.maps.Map(document.getElementById('map_canvas'),{
+      center:new google.maps.LatLng(42.456187,-71.0653),
+      zoom:10,
+      maxZoom:20,
+      mapTypeId:google.maps.MapTypeId.ROADMAP
+    });
+
+    navigator.geolocation.getCurrentPosition(function(position) {
+      var pos = new google.maps.LatLng(position.coords.latitude,
+                                       position.coords.longitude);
+
+      map.setCenter(pos);
+    });
+
+    //Inject JavaScript (returned JSON) into the head of the page.
+    var scriptElement=document.createElement('script');
+    scriptElement.src=DATA_SERVICE_URL;
+    document.getElementsByTagName('head')[0].appendChild(scriptElement);
+
+
+  }
+
+  function callback(data) {
+    for (var i=1;i<data.length;i++) {
+
+      address=data[i][2];
+
+      //Geocode the JSON returned from callback function.
+      codeAddress();
+    }
+
+  }
+
+  function codeAddress(){
+
+    //Google Async service.
+    geocoder.geocode({'address':address},function(results,status){
+
+        if (status == google.maps.GeocoderStatus.OK) {
+
+          var marker = new google.maps.Marker({
+            position:results[0].geometry.location,
+            map:map
+          });
+        }else{
+          alert('Geocode was not successful for the following reason:' + status);
+        }
+      });
+
+  }
+
+</script>
+<body onload="initialize()">
+  <div id="map_canvas"></div>
+  <div id="panel">
+    <div id="ctrl">
+      <input type="button" value="Update Map" onclick="document.location.reload(true)">
+    </div>
+    <div id="gform">
+      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfuHXWaEbH_uLnYXjkgH19BwfBG5jfjtE6p1oJt85skEd8CIw/viewform?embedded=true" width="640" height="1384" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
+    </div>
+  </div>
+</body>
+</html>
+
