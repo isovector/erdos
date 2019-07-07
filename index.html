@@ -62,7 +62,7 @@
   }
 
   function callback(data) {
-    console.log("hello" ++ data);
+    console.log(data);
     for (var i=1;i<data.length;i++) {
 
       address=data[i][2];
@@ -86,6 +86,7 @@
             animation: google.maps.Animation.DROP,
             map:map
           });
+          marker.setMap(map);
         }else{
           alert('Geocode was not successful for the following reason:' + status);
         }
